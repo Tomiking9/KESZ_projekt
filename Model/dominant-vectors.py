@@ -28,9 +28,12 @@ class Matrix:
         data.columns.name = "Length"
         return str(data)
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 
 # peti
+=======
+>>>>>>> main
 # test_arr = [[10, 0, 0], [10, 5, 0], [0, 10, 20]]
 # test = Matrix([40,60,80], test_arr)
 # print(test)
