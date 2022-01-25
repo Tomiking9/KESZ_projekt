@@ -28,16 +28,12 @@ class Matrix:
         data.columns.name = "Length"
         return str(data)
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
 
 # peti
-=======
->>>>>>> main
 # test_arr = [[10, 0, 0], [10, 5, 0], [0, 10, 20]]
 # test = Matrix([40,60,80], test_arr)
 # print(test)
-=======
+
         
 test_arr = [[10, 0, 0], [10, 5, 0], [0, 10, 20]]
 test = Matrix([40,60,80], test_arr)
@@ -83,4 +79,4 @@ class Hasse:
 
 h = Hasse([40,60,80])
 h.dominant_vectors()
->>>>>>> Stashed changes
+
