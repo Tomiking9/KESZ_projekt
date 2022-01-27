@@ -1,3 +1,4 @@
+import copy
 import numpy as np, pandas as pd
 from itertools import chain, combinations
 
@@ -50,33 +51,52 @@ class Hasse:
     def vector(self, value):
         self._vector = value
 
-    def powerset(self):
-        s = list(self.vector)
-        return chain.from_iterable(combinations(s, r) for r in range(1,len(s)+1)) # no empty set
+    def make_default_vector(self, pos):
+        empty = dict()
+        for i in self.vector:
+            empty[i] = 0
+        empty[pos] = 1
+        return empty
 
-    def is_subset(self, set, element):
-        for i in set:
-            if i.sort() == element.sort():
-                return True
-        return False
+    def compare_values(self, original_vect, new_vect):
+        original_vect_components = list(original_vect.values())
+        new_vect_components = list(new_vect.values())
+
+        return new_vect_components > original_vect_components # TODO: not gud, make it gud
+
+    def make_vector(self, vector, pos):
+        copy_vect = copy.copy(vector)
+        copy_vect[pos] += 1
+        return copy_vect
 
     def dominant_vectors(self):
         res = list()
         # add starting vectors TODO: separate function
         for i in self.vector:
-            res.append([i])
-        print(res)
+            res.append(self.make_default_vector(i))
 
-        # add combinations TODO: separate function
-        for i in range(3):
-            for j in self.vector:
-                temp = list()
-                temp.append(self.vector[i]), temp.append(j)
-                # check for subset
-                if not self.is_subset(res, temp):
-                    res.append(temp)
-        print(res)
+        bad_vectors = list()
+        while True:
+            for i in res:
+                for k in self.vector:
+                    new_vect = self.make_vector(i, k)
+                    if self.compare_values(i, new_vect) and (new_vect not in res):
+                        res.append(new_vect)
+                        if i not in bad_vectors:
+                            bad_vectors.append(i)
+                res = [item for item in res if (item not in bad_vectors)]
+                if (len(res) > 1000):
+                    break
+            if (len(res) > 1000):
+                break
 
-h = Hasse([40,60,80])
+        with open("vectors.txt", 'w') as file:
+            for i in res:
+                file.write(str(i) + '\n')
+            
+
+
+
+h = Hasse([40,60,80,100])
 h.dominant_vectors()
 
