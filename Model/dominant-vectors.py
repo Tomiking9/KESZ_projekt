@@ -1,4 +1,6 @@
 import copy
+from turtle import st
+from xml import dom
 import numpy as np, pandas as pd
 
 class Matrix:
@@ -59,12 +61,16 @@ class Hasse:
         copy_vect[pos] += 1
         return copy_vect
 
+    def end_of_batch_check(self, vector):
+        return vector[self.vector[-1]] == 15 # TODO: make it not ugly af
+
     def get_dominant_vectors(self):
         dominant_vectors = list()
-        # add starting vectors TODO: separate function
+        # add starting vectors
         for i in self.vector:
             dominant_vectors.append(self.make_default_vectors(i))
 
+        # get all combinations
         removed_vectors = list()
         while True:
             for start_vector in dominant_vectors:
@@ -75,7 +81,10 @@ class Hasse:
                         if start_vector not in removed_vectors:
                             removed_vectors.append(start_vector)
                 dominant_vectors = [v for v in dominant_vectors if (v not in removed_vectors)]
-            if len(dominant_vectors) > 50:
+
+                if self.end_of_batch_check(start_vector): # TODO: no comment needed
+                    break
+            if self.end_of_batch_check(start_vector):
                 break
         return dominant_vectors
 
@@ -85,40 +94,21 @@ class Hasse:
             vector.append(val)
         return tuple(vector)
 
-    def make_matrix(self):
+    def get_sample_vectors(self):
         vectors = self.get_dominant_vectors()
-        sample_vectors = Matrix()
-        matrix = list()
+        sample_vectors = list()
         for vect in vectors:
-            matrix.append(self.convert_into_vector(vect))
-
-        sample_vectors.quantity = matrix
-        sample_vectors.vector = self.vector
+            sample_vectors.append(self.convert_into_vector(vect))
         return sample_vectors
 
     def dump_into_txt(self, matrix):
         with open("matrix.txt", 'w') as file:
+            file.write(str(tuple(self.vector)) + '\n')
             for i in matrix:
                 file.write(str(i))
                 file.write('\n')
 
 h = Hasse([40,60,80,100], 15)
-mx = h.get_dominant_vectors()
+mx = h.get_sample_vectors()
 h.dump_into_txt(mx)
-
-
-
-# most epic error finder of all time
-for i in mx:
-    temp = list(i.values())
-    for j in mx:
-        temp2 = list(j.values())
-        if temp == temp2: continue
-
-        counter = list()
-        for k in range(4):
-            counter.append(temp[k] > temp2[k])
-        c = len(set(counter))
-        if c == 1:
-            print(temp, temp2)
-            print("HEY")
+print(mx)
