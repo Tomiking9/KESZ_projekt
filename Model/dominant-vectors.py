@@ -1,6 +1,4 @@
 import copy
-from turtle import st
-from xml import dom
 import numpy as np, pandas as pd
 
 # majd ha meglesz az adatbazisos csv ez majd atkonvertalja vmi matrixsza
@@ -35,6 +33,7 @@ class Matrix:
 
 # semmi koze a hasse-diagrammhoz igy utolag, mostmar hasse lesz
 # TODO: konkret ertekek helyet altalanosakkal
+# TODO: sample vectorok kiszurese (pl. mennyiseg, hossz alapjan)
 class Hasse:
     def __init__(self, vector, max_size):
         self.vector = vector
@@ -115,7 +114,7 @@ class Hasse:
             sample_vectors.append(self.convert_into_vector(vect))
         return sample_vectors
 
-    # hatha kelleni fog
+    # hatha kelleni fog, TODO: .csv ink?
     def dump_into_txt(self, matrix):
         with open("matrix.txt", 'w') as file:
             file.write(str(tuple(self.vector)) + '\n')
