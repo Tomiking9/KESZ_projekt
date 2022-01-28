@@ -3,6 +3,8 @@ from turtle import st
 from xml import dom
 import numpy as np, pandas as pd
 
+# majd ha meglesz az adatbazisos csv ez majd atkonvertalja vmi matrixsza
+# error handling mar az adatbazisnal ink
 class Matrix:
     def __init__(self, vector=list(), quantity=list()):
         self.vector = vector
@@ -30,11 +32,13 @@ class Matrix:
         data = pd.DataFrame(data[1:,1:], columns=headers, index=headers)
         data.columns.name = "Length"
         return str(data)
-        
+
+# semmi koze a hasse-diagrammhoz igy utolag, mostmar hasse lesz
+# TODO: konkret ertekek helyet altalanosakkal
 class Hasse:
     def __init__(self, vector, max_size):
         self.vector = vector
-        self.max_size = max_size
+        self.max_size = max_size # max size, azaz a legkisebbol mennyi fer ra. (TODO: Lehet mashogy?)
 
     @property
     def vector(self):
@@ -43,6 +47,14 @@ class Hasse:
     def vector(self, value):
         self._vector = value
 
+    @property
+    def max_size(self):
+        return self._max_size
+    @max_size.setter
+    def max_size(self, value):
+        self._max_size = value
+
+    # tehat a kezdo hosszaknal 1, tobbi 0
     def make_default_vectors(self, pos):
         empty = dict()
         for i in self.vector:
@@ -57,12 +69,12 @@ class Hasse:
         return new_vect_components > original_vect_components # TODO: not gud, make it gud / maybe gud??
 
     def increase_component(self, vector, pos):
-        copy_vect = copy.copy(vector)
+        copy_vect = copy.copy(vector) # copy me referencia rojal van
         copy_vect[pos] += 1
         return copy_vect
 
     def end_of_batch_check(self, vector):
-        return vector[self.vector[-1]] == 15 # TODO: make it not ugly af
+        return vector[self.vector[-1]] == self.max_size # TODO: make it not ugly af
 
     def get_dominant_vectors(self):
         dominant_vectors = list()
@@ -88,12 +100,14 @@ class Hasse:
                 break
         return dominant_vectors
 
+    # dict -> tuple
     def convert_into_vector(self, _dict):
         vector = list()
         for val in _dict.values():
             vector.append(val)
         return tuple(vector)
 
+    # list of tuples
     def get_sample_vectors(self):
         vectors = self.get_dominant_vectors()
         sample_vectors = list()
@@ -101,6 +115,7 @@ class Hasse:
             sample_vectors.append(self.convert_into_vector(vect))
         return sample_vectors
 
+    # hatha kelleni fog
     def dump_into_txt(self, matrix):
         with open("matrix.txt", 'w') as file:
             file.write(str(tuple(self.vector)) + '\n')
@@ -111,4 +126,3 @@ class Hasse:
 h = Hasse([40,60,80,100], 15)
 mx = h.get_sample_vectors()
 h.dump_into_txt(mx)
-print(mx)
