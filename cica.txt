@@ -17,3 +17,7 @@ for i in mx:
         if c == 1:
             print(temp, temp2)
             print("HEY")
+
+for i in var:
+    for j in i.values():
+        print(str(j) + '\t' + str(type(j)))

@@ -114,6 +114,18 @@ class Hasse:
             sample_vectors.append(self.convert_into_vector(vect))
         return sample_vectors
 
+    def separate_sample_vectors(self, vectors):
+        separated = list()
+        for i in self.vector:
+            separated.append([])
+
+        for v in vectors:
+            for i in range(len(v)):
+                if v[i] != 0:
+                    separated[i].append(v)
+        return separated
+            
+
     # hatha kelleni fog, TODO: .csv ink?
     def dump_into_txt(self, matrix):
         with open("matrix.txt", 'w') as file:
@@ -122,6 +134,7 @@ class Hasse:
                 file.write(str(i))
                 file.write('\n')
 
-h = Hasse([40,60,80,100], 15)
+h = Hasse([40,60,80,100], 2)
 mx = h.get_sample_vectors()
-h.dump_into_txt(mx)
+sep = h.separate_sample_vectors(mx)
+print(sep)

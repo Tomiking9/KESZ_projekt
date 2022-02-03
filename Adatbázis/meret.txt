@@ -1,1 +1,1 @@
-{'length: 0.9; width: 0.9': 17, 'length: 1; width: 0.9': 27, 'length: 1; width: 1': 21, 'length: 1.1; width: 1': 20, 'length: 1.1; width: 0.9': 1}
+{'0.9x0.9': 17, '1x0.9': 27, '1x1': 21, '1.1x1': 20, '1.1x0.9': 1}
