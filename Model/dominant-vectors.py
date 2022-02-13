@@ -1,8 +1,6 @@
 import copy
 import numpy as np, pandas as pd
 
-# majd ha meglesz az adatbazisos csv ez majd atkonvertalja vmi matrixsza
-# error handling mar az adatbazisnal ink
 class Matrix:
     def __init__(self, vector=list(), quantity=list()):
         self.vector = vector
@@ -31,9 +29,6 @@ class Matrix:
         data.columns.name = "Length"
         return str(data)
 
-# semmi koze a hasse-diagrammhoz igy utolag, mostmar hasse lesz
-# TODO: konkret ertekek helyet altalanosakkal
-# TODO: sample vectorok kiszurese (pl. mennyiseg, hossz alapjan)
 class Hasse:
     def __init__(self, vector, max_size):
         self.vector = vector
@@ -53,7 +48,6 @@ class Hasse:
     def max_size(self, value):
         self._max_size = value
 
-    # tehat a kezdo hosszaknal 1, tobbi 0
     def make_default_vectors(self, pos):
         empty = dict()
         for i in self.vector:
@@ -65,10 +59,10 @@ class Hasse:
         original_vect_components = list(original_vect.values())
         new_vect_components = list(new_vect.values())
 
-        return new_vect_components > original_vect_components # TODO: not gud, make it gud / maybe gud??
+        return new_vect_components > original_vect_components
 
     def increase_component(self, vector, pos):
-        copy_vect = copy.copy(vector) # copy me referencia rojal van
+        copy_vect = copy.copy(vector)
         copy_vect[pos] += 1
         return copy_vect
 
@@ -121,30 +115,15 @@ class Hasse:
             vector.append(val)
         return tuple(vector)
 
-    # list of tuples
     def get_sample_vectors(self):
         vectors = self.get_dominant_vectors()
         sample_vectors = list()
         for vect in vectors:
             sample_vectors.append(self.convert_into_vector(vect))
         return sample_vectors
-
-
-    def separate_sample_vectors(self, vectors):
-        separated = list()
-        for i in self.vector:
-            separated.append([])
-
-        for v in vectors:
-            for i in range(len(v)):
-                if v[i] != 0:
-                    separated[i].append(v)
-        return separated
             
-
-    # hatha kelleni fog, TODO: .csv ink?
     def dump_into_txt(self, matrix):
-        with open("csovek.txt", 'w') as file:
+        with open("matrix.txt", 'w') as file:
             file.write(str(tuple(self.vector)) + '\n')
             for i in matrix:
                 file.write(str(i))
@@ -152,5 +131,4 @@ class Hasse:
 
 h = Hasse([250,160,100], 5)
 mx = h.get_sample_vectors()
-sep = h.separate_sample_vectors(mx)
 print(mx)

@@ -5,10 +5,10 @@ from pulp import *
 # pulpTestAll()
 
 class LpModel:
-    def __init__(self, name, constraints, variables):
+    def __init__(self, name, quantity, sample_vectors):
         self.name = name
-        self.constraints = constraints
-        self.variables = variables # sample vectors
+        self.quantity = quantity
+        self.sample_vectors = sample_vectors
     
     @property
     def name(self):
@@ -21,22 +21,22 @@ class LpModel:
 
     
     @property
-    def constraints(self):
-        return self._constraints
-    @constraints.setter
-    def constraints(self, value):
+    def quantity(self):
+        return self._quantity
+    @quantity.setter
+    def quantity(self, value):
         if not isinstance(value, list):
             raise Exception
-        self._constraints = value
+        self._quantity = value
 
     @property
-    def variables(self):
-        return self._variables
-    @variables.setter
-    def variables(self, value):
+    def sample_vectors(self):
+        return self._sample_vectors
+    @sample_vectors.setter
+    def sample_vectors(self, value):
         if not isinstance(value, list):
             raise Exception
-        self._variables = value
+        self._sample_vectors = value
 
     def read_data_from_file(self, path):
         with open("meret.txt", 'r') as file:
@@ -44,7 +44,7 @@ class LpModel:
 
     def generate_variables(self):
         variables = list()
-        for vector in self.variables:
+        for vector in self.sample_vectors:
             name = 'x_'
             for i in vector:
                 name += str(i)
@@ -53,31 +53,29 @@ class LpModel:
 
     def get_coefficents(self, index):
         coefficents = list()
-        for i in self.variables:
+        for i in self.sample_vectors:
             coefficents.append(i[index])
         return coefficents
 
+    # 2d korl feltetelekre dupla list comprehension (?)
     def build_model(self):
         prob = LpProblem(self.name, LpMinimize)
 
         lpVars = self.generate_variables()
         prob += lpSum([var for var in lpVars])
 
-        for i in range(len(self.constraints)):
+        for i in range(len(self.quantity)):
             coefficents = self.get_coefficents(i)
-            prob += lpSum([coefficents[j] * lpVars[j] for j in range(len(lpVars))]) >= self.constraints[i]
+            prob += lpSum([coefficents[j] * lpVars[j] for j in range(len(lpVars))]) >= self.quantity[i]
 
         return prob
 
     def solve_lp(self, model):
-        print(model.objective)
-        for k,v in model.constraints.items():
-            print(k,v)
         model.writeLP("test.lp")
         model.solve()
         print("Status: ", LpStatus[model.status])
-        for v in model.variables():
-            print(v.name, "=", v.varValue)
+        # for v in model.variables():
+        #     print(v.name, "=", v.varValue)        
 
 test = LpModel("test", [70, 100, 120], [(2, 0, 1), (1, 2, 0), (1, 1, 1), (1, 0, 3), (0, 3, 1), (0, 2, 2), (0, 1, 4), (0, 0, 6)])
 model = test.build_model()
