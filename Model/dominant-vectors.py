@@ -75,6 +75,14 @@ class Hasse:
     def end_of_batch_check(self, vector):
         return vector[self.vector[-1]] == self.max_size # TODO: make it not ugly af
 
+    def check_constraint(self, vector):
+        _sum = 0
+        for k,v in vector.items():
+            _sum += k*v
+        
+        return (_sum <= 600)
+        
+
     def get_dominant_vectors(self):
         dominant_vectors = list()
         # add starting vectors
@@ -87,10 +95,16 @@ class Hasse:
             for start_vector in dominant_vectors:
                 for component in self.vector:
                     new_vector = self.increase_component(start_vector, component)
+
+                    if not self.check_constraint(new_vector):
+                        removed_vectors.append(new_vector)
+                        continue
+
                     if self.compare_values(start_vector, new_vector) and (new_vector not in dominant_vectors):
                         dominant_vectors.append(new_vector)
                         if start_vector not in removed_vectors:
                             removed_vectors.append(start_vector)
+
                 dominant_vectors = [v for v in dominant_vectors if (v not in removed_vectors)]
 
                 if self.end_of_batch_check(start_vector): # TODO: no comment needed
@@ -98,6 +112,7 @@ class Hasse:
             if self.end_of_batch_check(start_vector):
                 break
         return dominant_vectors
+
 
     # dict -> tuple
     def convert_into_vector(self, _dict):
@@ -114,6 +129,7 @@ class Hasse:
             sample_vectors.append(self.convert_into_vector(vect))
         return sample_vectors
 
+
     def separate_sample_vectors(self, vectors):
         separated = list()
         for i in self.vector:
@@ -128,13 +144,13 @@ class Hasse:
 
     # hatha kelleni fog, TODO: .csv ink?
     def dump_into_txt(self, matrix):
-        with open("matrix.txt", 'w') as file:
+        with open("csovek.txt", 'w') as file:
             file.write(str(tuple(self.vector)) + '\n')
             for i in matrix:
                 file.write(str(i))
                 file.write('\n')
 
-h = Hasse([40,60,80,100], 2)
+h = Hasse([250,160,100], 5)
 mx = h.get_sample_vectors()
 sep = h.separate_sample_vectors(mx)
-print(sep)
+print(mx)
