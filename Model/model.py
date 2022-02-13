@@ -48,7 +48,7 @@ class LpModel:
             name = 'x_'
             for i in vector:
                 name += str(i)
-            variables.append(LpVariable(name, 0, LpInteger))
+            variables.append(LpVariable(name, 0, upBound=None, cat=LpInteger))
         return variables
 
     def get_coefficents(self, index):
@@ -65,7 +65,7 @@ class LpModel:
 
         for i in range(len(self.constraints)):
             coefficents = self.get_coefficents(i)
-            prob += lpSum([coefficents[j] * lpVars[j] for j in range(len(lpVars))]) >= self.constraints[i],
+            prob += lpSum([coefficents[j] * lpVars[j] for j in range(len(lpVars))]) >= self.constraints[i]
 
         return prob
 
