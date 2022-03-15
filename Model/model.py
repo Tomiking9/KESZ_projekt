@@ -2,6 +2,8 @@
 # https://coin-or.github.io/pulp/CaseStudies/index.html             <- help
 from pathlib import Path
 from pulp import *
+
+
 # pulpTestAll()
 
 class LpModel:
@@ -9,20 +11,21 @@ class LpModel:
         self.name = name
         self.quantity = quantity
         self.sample_vectors = sample_vectors
-    
+
     @property
     def name(self):
         return self._name
+
     @name.setter
     def name(self, value):
         if not isinstance(value, str):
-            raise Exception # TODO: vmi ertelmes
+            raise Exception  # TODO: vmi ertelmes
         self._name = value
 
-    
     @property
     def quantity(self):
         return self._quantity
+
     @quantity.setter
     def quantity(self, value):
         if not isinstance(value, list):
@@ -32,6 +35,7 @@ class LpModel:
     @property
     def sample_vectors(self):
         return self._sample_vectors
+
     @sample_vectors.setter
     def sample_vectors(self, value):
         if not isinstance(value, list):
@@ -74,10 +78,11 @@ class LpModel:
         model.writeLP("test.lp")
         model.solve()
         print("Status: ", LpStatus[model.status])
-        # for v in model.variables():
-        #     print(v.name, "=", v.varValue)        
+        for v in model.variables():
+            print(v.name, "=", v.varValue)
 
-test = LpModel("test", [70, 100, 120], [(2, 0, 1), (1, 2, 0), (1, 1, 1), (1, 0, 3), (0, 3, 1), (0, 2, 2), (0, 1, 4), (0, 0, 6)])
+
+test = LpModel("test", [70, 100, 120],
+               [(2, 0, 1), (1, 2, 0), (1, 1, 1), (1, 0, 3), (0, 3, 1), (0, 2, 2), (0, 1, 4), (0, 0, 6)])
 model = test.build_model()
 test.solve_lp(model)
-

@@ -67,7 +67,7 @@ class Hasse:
         return copy_vect
 
     def end_of_batch_check(self, vector):
-        return vector[self.vector[-1]] == self.max_size # TODO: make it not ugly af
+        return vector[self.vector[-1]] == self.max_size
 
     def check_constraint(self, vector):
         _sum = 0
@@ -76,7 +76,7 @@ class Hasse:
         
         return (_sum <= 600)
         
-
+    # TODO: make it faster and not ugly
     def get_dominant_vectors(self):
         dominant_vectors = list()
         # add starting vectors
@@ -101,7 +101,7 @@ class Hasse:
 
                 dominant_vectors = [v for v in dominant_vectors if (v not in removed_vectors)]
 
-                if self.end_of_batch_check(start_vector): # TODO: no comment needed
+                if self.end_of_batch_check(start_vector):
                     break
             if self.end_of_batch_check(start_vector):
                 break
