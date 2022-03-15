@@ -1,38 +1,10 @@
 import copy
-import numpy as np, pandas as pd
-
-class Matrix:
-    def __init__(self, vector=list(), quantity=list()):
-        self.vector = vector
-        self.quantity = quantity
-    
-    @property
-    def vector(self):
-        return self._vector
-    @vector.setter
-    def vector(self, value):
-        self._vector = value
-
-    @property
-    def quantity(self):
-        return self._quantity
-    @quantity.setter
-    def quantity(self, value):
-        self._quantity = value
-
-    def __str__(self):
-        headers = [str(i) for i in self.vector]
-        data = [[self.quantity[i-1][j-1] for i in range(len(headers)+1)] for j in range(len(headers)+1)]            
-        data = np.array(data)
-
-        data = pd.DataFrame(data[1:,1:], columns=headers, index=headers)
-        data.columns.name = "Length"
-        return str(data)
 
 class Hasse:
     def __init__(self, vector, max_size):
         self.vector = vector
-        self.max_size = max_size # max size, azaz a legkisebbol mennyi fer ra. (TODO: Lehet mashogy?)
+        self.max_size = max_size # gyartosor hossza
+        self.sample_vectors = []
 
     @property
     def vector(self):
@@ -48,87 +20,59 @@ class Hasse:
     def max_size(self, value):
         self._max_size = value
 
-    def make_default_vectors(self, pos):
-        empty = dict()
+
+    def get_start_vectors(self):
+        res = list()
         for i in self.vector:
-            empty[i] = 0
-        empty[pos] = 1
-        return empty
+            temp = dict()
+            for j in self.vector:
+                temp[j] = 0
+            temp[i] = self.max_size // i
+            res.append(temp)
+        return res
 
-    def compare_values(self, original_vect, new_vect):
-        original_vect_components = list(original_vect.values())
-        new_vect_components = list(new_vect.values())
+    def get_component(self, vector):
+        for k,v in vector.items():
+            if v != 0: return k
 
-        return new_vect_components > original_vect_components
-
-    def increase_component(self, vector, pos):
-        copy_vect = copy.copy(vector)
-        copy_vect[pos] += 1
-        return copy_vect
-
-    def end_of_batch_check(self, vector):
-        return vector[self.vector[-1]] == self.max_size
-
-    def check_constraint(self, vector):
+    def calculate_length(self, vector):
         _sum = 0
         for k,v in vector.items():
-            _sum += k*v
-        
-        return (_sum <= 600)
-        
-    # TODO: make it faster and not ugly
-    def get_dominant_vectors(self):
-        dominant_vectors = list()
-        # add starting vectors
-        for i in self.vector:
-            dominant_vectors.append(self.make_default_vectors(i))
+            _sum += (k*v)
+        return _sum
 
-        # get all combinations
-        removed_vectors = list()
-        while True:
-            for start_vector in dominant_vectors:
-                for component in self.vector:
-                    new_vector = self.increase_component(start_vector, component)
-
-                    if not self.check_constraint(new_vector):
-                        removed_vectors.append(new_vector)
-                        continue
-
-                    if self.compare_values(start_vector, new_vector) and (new_vector not in dominant_vectors):
-                        dominant_vectors.append(new_vector)
-                        if start_vector not in removed_vectors:
-                            removed_vectors.append(start_vector)
-
-                dominant_vectors = [v for v in dominant_vectors if (v not in removed_vectors)]
-
-                if self.end_of_batch_check(start_vector):
-                    break
-            if self.end_of_batch_check(start_vector):
-                break
-        return dominant_vectors
+    def get_fit(self, vector, pos):
+        for k,v in vector.items():
+            if k == pos: continue
+            length = self.calculate_length(vector)
+            if length + k < self.max_size:
+                new_vect = vector.copy()
+                new_vect[k] += ((self.max_size - length) // k)
+                if new_vect not in self.sample_vectors:
+                    self.sample_vectors.append(new_vect)
 
 
-    # dict -> tuple
-    def convert_into_vector(self, _dict):
-        vector = list()
-        for val in _dict.values():
-            vector.append(val)
-        return tuple(vector)
 
-    def get_sample_vectors(self):
-        vectors = self.get_dominant_vectors()
-        sample_vectors = list()
-        for vect in vectors:
-            sample_vectors.append(self.convert_into_vector(vect))
-        return sample_vectors
-            
-    def dump_into_txt(self, matrix):
-        with open("matrix.txt", 'w') as file:
-            file.write(str(tuple(self.vector)) + '\n')
-            for i in matrix:
-                file.write(str(i))
-                file.write('\n')
 
-h = Hasse([250,160,100], 5)
-mx = h.get_sample_vectors()
-print(mx)
+    def get_all_combinations(self, vector):
+        res = list()
+        pos = self.get_component(vector)
+        while vector[pos] > 0:
+            vector[pos] -= 1
+            self.get_fit(vector.copy(), pos)
+
+# eleg a minimalisat belereakni (?), vegyeseket hogy, duplikaltak torlese
+
+    def get_sample_vectors(self, start_vectors):
+        for vector in start_vectors:
+            self.get_all_combinations(vector)
+
+
+h_test = Hasse([100, 160, 250], 600)
+h_test.get_sample_vectors(h_test.get_start_vectors())
+h = Hasse([100, 110, 120, 175], 600)
+
+# h = Hasse([100, 110, 120, 175], 4)
+# mx = h.get_sample_vectors()
+# print(mx)
+
