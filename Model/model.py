@@ -1,10 +1,11 @@
 # python -m pip install -U git+https://github.com/coin-or/pulp      <- terminalba
 # https://coin-or.github.io/pulp/CaseStudies/index.html             <- help
-from pathlib import Path
 from pulp import *
-
-
 # pulpTestAll()
+from dominant_vectors import SampleVectorGenerator
+import Adatbazis
+import os
+
 
 class LpModel:
     def __init__(self, name, quantity, sample_vectors):
@@ -19,7 +20,7 @@ class LpModel:
     @name.setter
     def name(self, value):
         if not isinstance(value, str):
-            raise Exception  # TODO: vmi ertelmes
+            raise Exception
         self._name = value
 
     @property
@@ -43,8 +44,8 @@ class LpModel:
         self._sample_vectors = value
 
     def read_data_from_file(self, path):
-        with open("meret.txt", 'r') as file:
-            pass
+        with open(path, 'r') as file:
+            print(file)
 
     def generate_variables(self):
         variables = list()
@@ -55,7 +56,7 @@ class LpModel:
             variables.append(LpVariable(name, 0, upBound=None, cat=LpInteger))
         return variables
 
-    def get_coefficents(self, index):
+    def get_coefficients(self, index):
         coefficents = list()
         for i in self.sample_vectors:
             coefficents.append(i[index])
@@ -65,12 +66,12 @@ class LpModel:
     def build_model(self):
         prob = LpProblem(self.name, LpMinimize)
 
-        lpVars = self.generate_variables()
-        prob += lpSum([var for var in lpVars])
+        lp_vars = self.generate_variables()
+        prob += lpSum([var for var in lp_vars])
 
         for i in range(len(self.quantity)):
-            coefficents = self.get_coefficents(i)
-            prob += lpSum([coefficents[j] * lpVars[j] for j in range(len(lpVars))]) >= self.quantity[i]
+            coefficients = self.get_coefficients(i)
+            prob += lpSum([coefficients[j] * lp_vars[j] for j in range(len(lp_vars))]) >= self.quantity[i]
 
         return prob
 
@@ -84,5 +85,6 @@ class LpModel:
 
 test = LpModel("test", [70, 100, 120],
                [(2, 0, 1), (1, 2, 0), (1, 1, 1), (1, 0, 3), (0, 3, 1), (0, 2, 2), (0, 1, 4), (0, 0, 6)])
-model = test.build_model()
-test.solve_lp(model)
+# model = test.build_model()
+# test.solve_lp(model)
+test.read_data_from_file(os.path.abspath("Adatbazis/meret.txt"))

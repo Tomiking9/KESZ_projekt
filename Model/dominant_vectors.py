@@ -51,15 +51,16 @@ class SampleVectorGenerator:
         return _sum
 
     def get_fit(self, vector, pos):
-        for k in vector.keys():
-            if k == pos: continue
+        for key in vector.keys():
+            if key == pos: continue
             length = self.calculate_length(vector)
-            if length + k <= self.max_size:
+            if length + key <= self.max_size:
                 new_vect = vector.copy()
                 # new_vect[k] += ((self.max_size - length) // k)
-                new_vect[k] += 1
+                new_vect[key] += 1
                 self.get_fit(new_vect, pos)
-                if new_vect not in self.sample_vectors and self.calculate_length(new_vect) > (self.max_size - self.get_minimal_element()):
+                if new_vect not in self.sample_vectors and self.calculate_length(new_vect) > \
+                        (self.max_size - self.get_minimal_element()):
                     self.sample_vectors.append(new_vect)
 
     def get_all_combinations(self, vector):

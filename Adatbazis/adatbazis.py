@@ -87,7 +87,7 @@ def time(input, project_id):
 
 beolvasott = read()
 # print(beolvasott)
-a = 1000;
+a = 1000
 b = 1100
 kehely = select(beolvasott, a, b)
 # print(kehely)
