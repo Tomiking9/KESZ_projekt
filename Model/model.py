@@ -3,8 +3,7 @@
 from pulp import *
 # pulpTestAll()
 from dominant_vectors import SampleVectorGenerator
-import Adatbazis
-import os
+from Adatbázis import adatbazis as db
 
 
 class LpModel:
@@ -45,7 +44,7 @@ class LpModel:
 
     def read_data_from_file(self, path):
         with open(path, 'r') as file:
-            print(file)
+            pass # TODO: Fucking .txt
 
     def generate_variables(self):
         variables = list()
@@ -83,8 +82,19 @@ class LpModel:
             print(v.name, "=", v.varValue)
 
 
-test = LpModel("test", [70, 100, 120],
-               [(2, 0, 1), (1, 2, 0), (1, 1, 1), (1, 0, 3), (0, 3, 1), (0, 2, 2), (0, 1, 4), (0, 0, 6)])
+_quantity = [i[-1] for i in db.meret]
+lengths = list(set([i for i in itertools.chain(*db.meret) if i not in _quantity]))  # 20000000000iq
+
+lengths = [int(i*100) for i in lengths]
+svg = SampleVectorGenerator(vector=lengths, max_size=600)
+svg.get_sample_vectors()
+test = LpModel("test", _quantity, svg.sample_vectors)
+
+# test = LpModel("test", [70, 100, 120],
+#                [(2, 0, 1), (1, 2, 0), (1, 1, 1), (1, 0, 3), (0, 3, 1), (0, 2, 2), (0, 1, 4), (0, 0, 6)])
 # model = test.build_model()
 # test.solve_lp(model)
-test.read_data_from_file(os.path.abspath("Adatbazis/meret.txt"))
+# test.read_data_from_file(os.path.abspath("../Adatbázis/meret.txt"))
+
+model = test.build_model()
+test.solve_lp(model)

@@ -74,6 +74,11 @@ class SampleVectorGenerator:
         for vector in start:
             self.get_all_combinations(vector)
 
+        res = list()
+        for d in self.sample_vectors:
+            res.append(tuple(d.values()))
+        self.sample_vectors = res
+
 
 # h_test1 = SampleVectorGenerator([40,60,80], 600)
 # h_test2 = SampleVectorGenerator([100,160,250], 600)
@@ -95,7 +100,7 @@ class SampleVectorGenerator:
 
 h = SampleVectorGenerator([110, 100, 120, 175], 600)
 h.get_sample_vectors()
-for i in h.sample_vectors:
-    print(i)
-print(len(h.sample_vectors))
+# for i in h.sample_vectors:
+#     print(i)
+# print(len(h.sample_vectors))
 
