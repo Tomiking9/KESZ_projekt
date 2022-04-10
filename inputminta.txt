@@ -1,3 +1,0 @@
-szám
-szélességek
-magasságok
