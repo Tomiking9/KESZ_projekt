@@ -2,8 +2,8 @@
 # https://coin-or.github.io/pulp/CaseStudies/index.html             <- help
 from pulp import *
 import dominant_vectors as dv
-import database as db
 import pandas as pd
+import argparse
 class LpModel:
     def __init__(self, name, quantity, sample_vectors):
         self.name = name
@@ -54,6 +54,7 @@ def solve_lp(model):
     for v in model.variables():
         print(v.name, "=", v.varValue)
 
+# TODO refactor (input file / in folder)
 def get_data():
     matrix = list()
     with open("/Users/szameltamas/Desktop/KESZ_projekt/Others/elements.txt", 'r') as file:
@@ -66,7 +67,23 @@ def get_data():
     return matrix
 
 
-lut = pd.DataFrame(get_data(), columns=["id", "lenght", "width", "quantity"]).drop(columns=["id"])
+def get_data_from_arg():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("file")
+    args = parser.parse_args()
+    matrix = list()
+    with open(args.file) as file:
+        content = file.readlines()
+        content = [row.strip('\n') for row in content]
+        for row in content:
+            separated = row.split(';')
+            temp = [int(i) for i in separated]
+            matrix.append(temp)
+    return matrix
+
+
+
+lut = pd.DataFrame(get_data_from_arg(), columns=["id", "lenght", "width", "quantity"]).drop(columns=["id"])
 lengths = sorted(list(set(lut["lenght"].tolist()).union(set(lut["width"].tolist()))))
 _quantity = lut["quantity"].tolist()
 
