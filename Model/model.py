@@ -1,100 +1,76 @@
 # python -m pip install -U git+https://github.com/coin-or/pulp      <- terminalba
 # https://coin-or.github.io/pulp/CaseStudies/index.html             <- help
 from pulp import *
-# pulpTestAll()
-from dominant_vectors import SampleVectorGenerator
-from Adatbázis import adatbazis as db
-
-
+import dominant_vectors as dv
+import database as db
+import pandas as pd
 class LpModel:
     def __init__(self, name, quantity, sample_vectors):
         self.name = name
         self.quantity = quantity
         self.sample_vectors = sample_vectors
 
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, value):
-        if not isinstance(value, str):
-            raise Exception
-        self._name = value
-
-    @property
-    def quantity(self):
-        return self._quantity
-
-    @quantity.setter
-    def quantity(self, value):
-        if not isinstance(value, list):
-            raise Exception
-        self._quantity = value
-
-    @property
-    def sample_vectors(self):
-        return self._sample_vectors
-
-    @sample_vectors.setter
-    def sample_vectors(self, value):
-        if not isinstance(value, list):
-            raise Exception
-        self._sample_vectors = value
-
-    def read_data_from_file(self, path):
-        with open(path, 'r') as file:
-            pass # TODO: Fucking .txt
-
-    def generate_variables(self):
+    def generate_variables(self, name):
         variables = list()
         for vector in self.sample_vectors:
-            name = 'x_'
+            var_name = name
             for i in vector:
-                name += str(i)
-            variables.append(LpVariable(name, 0, upBound=None, cat=LpInteger))
+                var_name += str(i)
+            variables.append(LpVariable(var_name, 0, upBound=None, cat=LpInteger))
         return variables
 
+
     def get_coefficients(self, index):
+        global lut
+        component = lengths.index(lut.iloc[index]["lenght"])
         coefficents = list()
+
         for i in self.sample_vectors:
-            coefficents.append(i[index])
+            coefficents.append(i[component])
         return coefficents
 
-    # 2d korl feltetelekre dupla list comprehension (?)
     def build_model(self):
         prob = LpProblem(self.name, LpMinimize)
 
-        lp_vars = self.generate_variables()
-        prob += lpSum([var for var in lp_vars])
+        lp_x_vars = self.generate_variables("x_")
+        lp_y_vars = self.generate_variables("y_")
+
+        prob += lpSum([lp_x_vars[i] + lp_y_vars[i] for i in range(len(lp_x_vars))])
 
         for i in range(len(self.quantity)):
             coefficients = self.get_coefficients(i)
-            prob += lpSum([coefficients[j] * lp_vars[j] for j in range(len(lp_vars))]) >= self.quantity[i]
+            prob += lpSum([coefficients[j] * lp_x_vars[j] for j in range(len(lp_x_vars))]) >= self.quantity[i]
+
+        for i in range(len(lp_y_vars)):
+            prob += lpSum([lp_x_vars[i] - 1000 * lp_y_vars[i]]) <= 0
 
         return prob
 
-    def solve_lp(self, model):
-        model.writeLP("test.lp")
-        model.solve()
-        print("Status: ", LpStatus[model.status])
-        for v in model.variables():
-            print(v.name, "=", v.varValue)
+
+def solve_lp(model):
+    model.writeLP("test.lp")
+    model.solve()
+    print("Status: ", LpStatus[model.status])
+    for v in model.variables():
+        print(v.name, "=", v.varValue)
+
+def get_data():
+    matrix = list()
+    with open("/Users/szameltamas/Desktop/KESZ_projekt/Others/elements.txt", 'r') as file:
+        content = file.readlines()
+        content = [row.strip('\n') for row in content]
+        for row in content:
+            separated = row.split(';')
+            temp = [int(i) for i in separated]
+            matrix.append(temp)
+    return matrix
 
 
-_quantity = [i[-1] for i in db.meret]
-lengths = list(set([i for i in itertools.chain(*db.meret) if i not in _quantity]))  # 20000000000iq
+lut = pd.DataFrame(get_data(), columns=["id", "lenght", "width", "quantity"]).drop(columns=["id"])
+lengths = sorted(list(set(lut["lenght"].tolist()).union(set(lut["width"].tolist()))))
+_quantity = lut["quantity"].tolist()
 
-lengths = [int(i*100) for i in lengths]
-svg = SampleVectorGenerator(vector=lengths, max_size=600)
-svg.get_sample_vectors()
-test = LpModel("test", _quantity, svg.sample_vectors)
 
-# test = LpModel("test", [70, 100, 120],
-#                [(2, 0, 1), (1, 2, 0), (1, 1, 1), (1, 0, 3), (0, 3, 1), (0, 2, 2), (0, 1, 4), (0, 0, 6)])
-# model = test.build_model()
-# test.solve_lp(model)
-# test.read_data_from_file(os.path.abspath("../Adatbázis/meret.txt"))
-
-model = test.build_model()
-test.solve_lp(model)
+lp = LpModel("test", _quantity, dv.get_sample_vectors())
+kehely_model = lp.build_model()
+solve_lp(kehely_model)

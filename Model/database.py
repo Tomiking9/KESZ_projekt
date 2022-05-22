@@ -3,7 +3,8 @@ from pathlib import Path
 
 
 def read():
-    p = Path(__file__).with_name('gyartastervezes_csv3.csv')
+    # TODO parancssori argba
+    p = next(Path("/Users/szameltamas/Desktop/KESZ_projekt/Others").glob("*.csv"))
     with p.open('r', encoding="utf-8") as file:
         content = file.readlines()
         scanned = np.zeros((len(content), 5)).astype(str)
@@ -60,7 +61,7 @@ def sizes(input, project_id):
     size2 = np.array(size2).reshape(-1, 2)
     frequency = np.array(list(size.values())).reshape(-1, 1)
     output = np.hstack((size2, frequency)).astype(float)
-    p = Path(__file__).with_name('meret.txt')
+    p = Path("/Users/szameltamas/Desktop/KESZ_projekt/Others/meret.txt")
     with p.open('w') as file:
         file.write(str(output))
     return output
