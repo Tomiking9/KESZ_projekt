@@ -2,7 +2,8 @@ from pulp import *
 import vectors
 import pandas as pd
 import argparse
-import amplpy
+from amplpy import AMPL, Environment
+
 class LpModel:
     def __init__(self, name, data):
         self.name = name
@@ -25,9 +26,7 @@ class LpModel:
             for i in vector:
                 var_name += str(i)
             variables.append(LpVariable(var_name, 0, upBound=None, cat=LpInteger))
-            # variables.append(LpVariable(, 0, upBound=None, cat=LpInteger))
         return variables
-
 
     def get_coefficients(self, index):
         coefficents = list()
@@ -57,7 +56,7 @@ class LpModel:
 
 def solve_lp(model):
     model.writeLP("test.lp")
-    
+    model.solve()
     print("Status: ", LpStatus[model.status])
     for v in model.variables():
         print(v.name, "=", v.varValue)

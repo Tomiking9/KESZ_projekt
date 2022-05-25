@@ -8,7 +8,7 @@ sample_vectors = set()                                                          
 # returns a pandas dataframe
 def read_from_file():
     matrix = list()
-    with open("/Users/szameltamas/Desktop/KESZ_projekt/Others/elements.txt", 'r') as file:
+    with open("/Users/szameltamas/Desktop/KESZ_projekt/Others/elements2.txt", 'r') as file:
         content = file.readlines()
         content = [row.strip('\n') for row in content]
         for row in content:
@@ -58,6 +58,12 @@ def get_minimal_element(lengths):
         if i == -1: continue
         if i < _min: _min = i
     return _min
+def remove_duplicates(lst):
+    res = list()
+    for i in lst:
+        if i not in res:
+            res.append(i)
+    return res
 
 # to generate the sample vectors from all starting points, only 1 length is valid
 def separate(vector):
@@ -128,5 +134,11 @@ def generate_sample_vectors(param):
     df = np.where(df[:] == -1, 0, df)
     filtered = pd.DataFrame(df)
 
-    result = list(filtered.to_records(index=False))
-    return result
+    result = list((filtered.to_records(index=False)))
+    return remove_duplicates(result)
+
+
+kutya = generate_sample_vectors(find_cohesive_items(read_from_file()))
+print(len(kutya))
+for i in kutya:
+    print(i)
