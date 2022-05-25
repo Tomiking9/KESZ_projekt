@@ -134,11 +134,5 @@ def generate_sample_vectors(param):
     df = np.where(df[:] == -1, 0, df)
     filtered = pd.DataFrame(df)
 
-    result = list((filtered.to_records(index=False)))
+    result = list((filtered.to_records(index=False)))                                   # apparently, removing the (-1)-s may make duplicated samples
     return remove_duplicates(result)
-
-
-kutya = generate_sample_vectors(find_cohesive_items(read_from_file()))
-print(len(kutya))
-for i in kutya:
-    print(i)

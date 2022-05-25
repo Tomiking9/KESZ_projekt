@@ -1,8 +1,6 @@
 from pulp import *
 import vectors
-import pandas as pd
 import argparse
-from amplpy import AMPL, Environment
 
 class LpModel:
     def __init__(self, name, data):
@@ -10,14 +8,17 @@ class LpModel:
         self.quantity = data["quantity"].tolist()
         self.sample_vectors = data
 
+
     @property
     def sample_vectors(self):
         return self._sample_vectors
+
 
     @sample_vectors.setter
     def sample_vectors(self, data):
         items = vectors.find_cohesive_items(data)
         self._sample_vectors = vectors.generate_sample_vectors(items)
+
 
     def generate_variables(self, name):
         variables = list()
@@ -27,6 +28,7 @@ class LpModel:
                 var_name += str(i)
             variables.append(LpVariable(var_name, 0, upBound=None, cat=LpInteger))
         return variables
+
 
     def get_coefficients(self, index):
         coefficents = list()
@@ -55,13 +57,19 @@ class LpModel:
 
 
 def solve_lp(model):
-    model.writeLP("test.lp")
+    model.writeLP(model.name + ".lp")
     model.solve()
-    print("Status: ", LpStatus[model.status])
-    for v in model.variables():
-        print(v.name, "=", v.varValue)
 
+    with open(model.name + ".txt", 'w') as file:
+        row = ""
+        for var in model.variables():
+            if var.varValue != 0:
+                temp = var.name.split('_')[1]
+                name = ';'.join(str(c) for c in str(temp))
+                row += str(int(var.varValue)) + ';' + name + '\n'
+        file.writelines(row[:-1])
 
+    
 def get_data_from_arg():
     parser = argparse.ArgumentParser()
     parser.add_argument("file")
@@ -78,6 +86,6 @@ def get_data_from_arg():
 
 
 df = vectors.read_from_file()
-lp = LpModel("test", df)
+lp = LpModel("cica", df)
 kehely_model = lp.build_model()
 solve_lp(kehely_model)
