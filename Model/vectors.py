@@ -1,14 +1,17 @@
-import sys
+import sys, argparse
 import pandas as pd
 import numpy as np
 
 MAX_SIZE = 600                                                                          # the rows length
 sample_vectors = set()                                                                  # the resultant sample vectors
 
-# returns a pandas dataframe
+# returns a pandas dataframe created from the input .txt
 def read_from_file():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("file")
+    args = parser.parse_args()
     matrix = list()
-    with open("/Users/szameltamas/Desktop/KESZ_projekt/Others/elements2.txt", 'r') as file:
+    with open(args.file, 'r') as file:
         content = file.readlines()
         content = [row.strip('\n') for row in content]
         for row in content:

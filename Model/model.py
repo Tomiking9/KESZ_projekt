@@ -57,10 +57,11 @@ class LpModel:
 
 
 def solve_lp(model):
-    model.writeLP(model.name + ".lp")
+    print(type(model))
+    model.writeLP("Others/" + model.name + ".lp")
     model.solve()
 
-    with open(model.name + ".txt", 'w') as file:
+    with open("Others/" + model.name + ".txt", 'w') as file:
         row = ""
         for var in model.variables():
             if var.varValue != 0:
@@ -68,21 +69,6 @@ def solve_lp(model):
                 name = ';'.join(str(c) for c in str(temp))
                 row += str(int(var.varValue)) + ';' + name + '\n'
         file.writelines(row[:-1])
-
-    
-def get_data_from_arg():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("file")
-    args = parser.parse_args()
-    matrix = list()
-    with open(args.file) as file:
-        content = file.readlines()
-        content = [row.strip('\n') for row in content]
-        for row in content:
-            separated = row.split(';')
-            temp = [int(i) for i in separated]
-            matrix.append(temp)
-    return matrix
 
 
 df = vectors.read_from_file()
