@@ -1,3 +1,0 @@
-kelyhek száma
-szélességek (vesszővel elválasztva)
-magasságok (vesszővel elválasztva)

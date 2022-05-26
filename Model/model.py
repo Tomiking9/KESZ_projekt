@@ -1,6 +1,5 @@
-from pulp import *
 import vectors
-
+from pulp import *
 class LpModel:
     def __init__(self, name, data):
         self.name = name
@@ -54,6 +53,8 @@ class LpModel:
 
         return prob
 
+def read_data():
+    return vectors.read_from_file()
 
 def solve_lp(model):
     model.writeLP(model.name + ".lp")
