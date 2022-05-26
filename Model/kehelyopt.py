@@ -1,4 +1,6 @@
-import model, dominant_vectors as dv
-import pandas as pd
+import model, vectors
 
-# TODO make this the exe
+df = vectors.read_from_file()
+lp = model.LpModel("result", df)
+kehely_model = lp.build_model()
+model.solve_lp(kehely_model)

@@ -1,6 +1,5 @@
 from pulp import *
 import vectors
-import argparse
 
 class LpModel:
     def __init__(self, name, data):
@@ -57,21 +56,18 @@ class LpModel:
 
 
 def solve_lp(model):
-    print(type(model))
-    model.writeLP("Others/" + model.name + ".lp")
+    model.writeLP(model.name + ".lp")
     model.solve()
 
-    with open("Others/" + model.name + ".txt", 'w') as file:
+    result = dict()
+    for var in model.variables():
+        if var.varValue != 0 and var.name.split('_')[0] != 'y':
+            temp = var.name.split('_')[1]
+            name = ';'.join(str(c) for c in str(temp))
+            result[var.varValue] = str(int(var.varValue)) + ';' + name + '\n'
+
+    with open(model.name + ".txt", 'w') as file:
         row = ""
-        for var in model.variables():
-            if var.varValue != 0:
-                temp = var.name.split('_')[1]
-                name = ';'.join(str(c) for c in str(temp))
-                row += str(int(var.varValue)) + ';' + name + '\n'
+        for var in sorted(result.items(), reverse=True):
+            row += var[1]
         file.writelines(row[:-1])
-
-
-df = vectors.read_from_file()
-lp = LpModel("cica", df)
-kehely_model = lp.build_model()
-solve_lp(kehely_model)
