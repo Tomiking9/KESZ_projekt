@@ -1,9 +1,16 @@
-import sys, argparse
+import sys, argparse, json
 import pandas as pd
 import numpy as np
 
-MAX_SIZE = 600                                                                          # the rows length
+def read_config(file_path):
+    with open(file_path) as file:
+        parser = json.load(file)
+    return parser
+        
+config = read_config("config.json")
 sample_vectors = set()                                                                  # the resultant sample vectors
+MAX_SIZE = config["max_length"]                                                         # the rows length
+OFFSET = config["space"]                                                                # space between elements
 
 # returns a pandas dataframe created from the input .txt
 def read_from_file():
@@ -118,7 +125,7 @@ def get_fit(vector, position, lengths):
             new_vector[index] += 1                                                      # if so, increase that by 1, calculate length again
 
             min_size = MAX_SIZE - get_minimal_element(lengths)
-            if min_size <= calculate_sample_length(new_vector, lengths) <= MAX_SIZE:    # see if it doesnt leave any space behind
+            if min_size <= calculate_sample_length(new_vector, lengths) <= MAX_SIZE - OFFSET:    # see if it doesnt leave any space behind
                 sample_vectors.add(tuple(new_vector))
             get_fit(new_vector, index, lengths)                                         # recursive call, to get all possible combinations
             

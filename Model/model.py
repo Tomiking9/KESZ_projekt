@@ -23,7 +23,7 @@ class LpModel:
         for vector in self.sample_vectors:
             var_name = name
             for i in vector:
-                var_name += str(i)
+                var_name += str(i) + ';'
             variables.append(LpVariable(var_name, 0, upBound=None, cat=LpInteger))
         return variables
 
@@ -38,7 +38,6 @@ class LpModel:
 
     def build_model(self):
         prob = LpProblem(self.name, LpMinimize)
-
         lp_x_vars = self.generate_variables("x_")
         lp_y_vars = self.generate_variables("y_")
 
@@ -57,14 +56,15 @@ def read_data():
     return vectors.read_from_file()
 
 def solve_lp(model):
+    solver = pulp.PULP_CBC_CMD(timeLimit=vectors.config["time_limit"])
     model.writeLP(model.name + ".lp")
-    model.solve()
+    model.solve(solver)
 
     result = dict()
     for var in model.variables():
+        print(var.name, "=", var.varValue)
         if var.varValue != 0 and var.name.split('_')[0] != 'y':
-            temp = var.name.split('_')[1]
-            name = ';'.join(str(c) for c in str(temp))
+            name = var.name.split('_')[1][:-1]
             result[var.varValue] = str(int(var.varValue)) + ';' + name + '\n'
 
     with open(model.name + ".txt", 'w') as file:
