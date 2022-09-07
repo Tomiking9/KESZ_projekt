@@ -61,11 +61,13 @@ def solve_lp(model):
     model.solve(solver)
 
     result = dict()
+    i=0
     for var in model.variables():
         print(var.name, "=", var.varValue)
         if var.varValue != 0 and var.name.split('_')[0] != 'y':
+            i=i+1
             name = var.name.split('_')[1][:-1]
-            result[var.varValue] = str(int(var.varValue)) + ';' + name + '\n'
+            result[int(var.varValue)*1000+i] = str(int(var.varValue)) + ';' + name + '\n'
 
     with open(model.name + ".txt", 'w') as file:
         row = ""

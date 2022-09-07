@@ -9,8 +9,8 @@ def read_config(file_path):
         
 config = read_config("config.json")
 sample_vectors = set()                                                                  # the resultant sample vectors
-MAX_SIZE = config["max_length"]                                                         # the rows length
 OFFSET = config["space"]                                                                # space between elements
+MAX_SIZE = config["max_length"] - OFFSET                                                        # the rows length
 
 # returns a pandas dataframe created from the input .txt
 def read_from_file():
@@ -60,7 +60,7 @@ def calculate_sample_length(vector, lengths):
     _sum = 0
     for i in range(len(vector)):
         if i == -1: continue
-        _sum += (vector[i] * lengths[i])
+        _sum += (vector[i] * (lengths[i]+OFFSET))
     return _sum
 def get_minimal_element(lengths):
     _min = sys.maxsize
@@ -97,8 +97,8 @@ def make_quantity_list(element):
     quantity = list()
     for i in range(len(element)):
         if element[i] > 0:
-            quantity.append(MAX_SIZE // element[i])
-
+            quantity.append((MAX_SIZE) // (element[i]+OFFSET))
+            #quantity.append((MAX_SIZE) // (element[i]))
         else:
             if element[i] == 0: quantity.append(0)
             else: quantity.append(-1)
@@ -125,7 +125,7 @@ def get_fit(vector, position, lengths):
             new_vector[index] += 1                                                      # if so, increase that by 1, calculate length again
 
             min_size = MAX_SIZE - get_minimal_element(lengths)
-            if min_size <= calculate_sample_length(new_vector, lengths) <= MAX_SIZE - OFFSET:    # see if it doesnt leave any space behind
+            if min_size <= calculate_sample_length(new_vector, lengths) <= MAX_SIZE:    # see if it doesnt leave any space behind
                 sample_vectors.add(tuple(new_vector))
             get_fit(new_vector, index, lengths)                                         # recursive call, to get all possible combinations
             
